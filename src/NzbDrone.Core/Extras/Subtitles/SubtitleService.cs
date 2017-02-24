@@ -73,7 +73,7 @@ namespace NzbDrone.Core.Extras.Subtitles
                     foreach (var extraFile in group)
                     {
                         var existingFileName = Path.Combine(series.Path, extraFile.RelativePath);
-                        var extension = GetExtension(extraFile, existingFileName, copy, groupCount > 1);
+                        var extension = GetExtension(extraFile.Language, existingFileName, copy, groupCount > 1);
                         var newFileName = Path.ChangeExtension(Path.Combine(series.Path, episodeFile.RelativePath), extension);
 
                         if (newFileName.PathNotEquals(existingFileName))
@@ -104,8 +104,11 @@ namespace NzbDrone.Core.Extras.Subtitles
         {
             if (SubtitleFileExtensions.Extensions.Contains(Path.GetExtension(path)))
             {
+                var language = LanguageParser.ParseSubtitleLanguage(path);
+                extension = GetExtension(language, path, 1, false);
+
                 var subtitleFile = ImportFile(series, episodeFile, path, extension, readOnly);
-                subtitleFile.Language = LanguageParser.ParseSubtitleLanguage(path);
+                subtitleFile.Language = language;
 
                 _subtitleFileService.Upsert(subtitleFile);
 
@@ -115,7 +118,7 @@ namespace NzbDrone.Core.Extras.Subtitles
             return null;
         }
 
-        private string GetExtension(SubtitleFile extraFile, string existingFileName, int copy, bool multipleCopies = false)
+        private string GetExtension(Language language, string existingFileName, int copy, bool multipleCopies = false)
         {
             var fileExtension = Path.GetExtension(existingFileName);
             var extensionBuilder = new StringBuilder();
@@ -126,9 +129,9 @@ namespace NzbDrone.Core.Extras.Subtitles
                 extensionBuilder.Append(".");
             }
 
-            if (extraFile.Language != Language.Unknown)
+            if (language != Language.Unknown)
             {
-                extensionBuilder.Append(IsoLanguages.Get(extraFile.Language).TwoLetterCode);
+                extensionBuilder.Append(IsoLanguages.Get(language).TwoLetterCode);
                 extensionBuilder.Append(".");
             }
 
