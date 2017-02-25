@@ -82,6 +82,7 @@ namespace NzbDrone.Core.Extras.Files
 
         protected TExtraFile MoveFile(Series series, EpisodeFile episodeFile, TExtraFile extraFile, string fileNameSuffix = null)
         {
+            var newFolder = Path.GetDirectoryName(Path.Combine(series.Path, episodeFile.RelativePath));
             var filenameBuilder = new StringBuilder(Path.GetFileNameWithoutExtension(episodeFile.RelativePath));
 
             if (fileNameSuffix.IsNotNullOrWhiteSpace())
@@ -92,7 +93,7 @@ namespace NzbDrone.Core.Extras.Files
             filenameBuilder.Append(extraFile.Extension);
 
             var existingFileName = Path.Combine(series.Path, extraFile.RelativePath);
-            var newFileName = Path.Combine(series.Path, filenameBuilder.ToString());
+            var newFileName = Path.Combine(newFolder, filenameBuilder.ToString());
 
             if (newFileName.PathNotEquals(existingFileName))
             {
