@@ -106,13 +106,16 @@ namespace NzbDrone.Core.Extras.Subtitles
             if (multipleCopies)
             {
                 extensionBuilder.Append(copy);
+            }
+
+            if (multipleCopies && language != Language.Unknown)
+            {
                 extensionBuilder.Append(".");
             }
 
             if (language != Language.Unknown)
             {
                 extensionBuilder.Append(IsoLanguages.Get(language).TwoLetterCode);
-                extensionBuilder.Append(".");
             }
 
             return extensionBuilder.ToString();
